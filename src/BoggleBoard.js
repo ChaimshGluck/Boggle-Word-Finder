@@ -1,6 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useContext, useRef } from 'react';
+import { BoggleContext } from './BoggleContext';
 
-function BoggleBoard({ boardSize, board, setBoard, highlightedLetters }) {
+function BoggleBoard() {
+    const { boardSize, board, setBoard, gameType, highlightedLetters } = useContext(BoggleContext);
     const inputsRef = useRef([]);
 
     // Handle input change
@@ -11,7 +13,6 @@ function BoggleBoard({ boardSize, board, setBoard, highlightedLetters }) {
 
         // Update board state
         setBoard(prevBoard => {
-
             // Create a new board with the updated value
             const newBoard = prevBoard.map(row => row.slice());
             newBoard[rowIndex][colIndex] = value;
@@ -25,25 +26,41 @@ function BoggleBoard({ boardSize, board, setBoard, highlightedLetters }) {
         }
     };
 
+    const handleButtonClick = (row, col) => {
+        console.log(`Button clicked at ${row}, ${col}`);
+    };
+
     const renderBoard = () => {
         const boardRows = [];
         for (let row = 0; row < boardSize; row++) {
             const rowBoxes = [];
             for (let col = 0; col < boardSize; col++) {
-                rowBoxes.push(
-                    <input
-                        key={`${row}-${col}`}
-                        type="text"
-                        className={`board-input ${highlightedLetters.includes(`${row}-${col}`) ? 'highlighted' : ''} ${boardSize === 5 ? 'input-5x5' : 'input-4x4'}`}
-                        maxLength="1"
-                        value={board[row][col]}
-                        onChange={(e) => handleInputChange(e, row, col)}
-                        ref={(el) => (inputsRef.current[row * boardSize + col] = el)}
-                    />
-                );
+                if (gameType === 'regular-boggle') {
+                    rowBoxes.push(
+                        <button
+                            key={`${row}-${col}`}
+                            className={`board-box ${highlightedLetters?.includes(`${row}-${col}`) ? 'highlighted' : ''} ${boardSize === 5 ? 'input-5x5' : 'input-4x4'}`}
+                            onClick={() => handleButtonClick(row, col)}
+                        >
+                            {board[row][col]}
+                        </button>
+                    );
+                } else {
+                    rowBoxes.push(
+                        <input
+                            key={`${row}-${col}`}
+                            type="text"
+                            className={`board-input ${highlightedLetters?.includes(`${row}-${col}`) ? 'highlighted' : ''} ${boardSize === 5 ? 'input-5x5' : 'input-4x4'}`}
+                            maxLength="1"
+                            value={board[row][col]}
+                            onChange={(e) => handleInputChange(e, row, col)}
+                            ref={(el) => (inputsRef.current[row * boardSize + col] = el)}
+                        />
+                    );
+                }
             }
             boardRows.push(
-                <div className='board-row' >
+                <div className='board-row' key={row} >
                     {rowBoxes}
                 </div>
             );

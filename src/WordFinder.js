@@ -1,27 +1,26 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useContext } from "react";
 import BoggleBoard from "./BoggleBoard";
 import '../src/app.css';
-import generateRandomBoard from "./randomBoard";
+import BoardControllers from "./BoardControllers";
+import { BoggleContext } from "./BoggleContext";
 
-function FindWords() {
-    const [foundWords, setFoundWords] = useState([]);
-    const [filteredWords, setFilteredWords] = useState([]);
+function WordFinder() {
+    const { board, foundWords, setFoundWords, hasFoundWords, setHasFoundWords, minLetters, setMinLetters, popupContent, setPopupContent, popupVisible, setPopupVisible, clearBoard, setHighlightedLetters } = useContext(BoggleContext);
+
     const [dictionary, setDictionary] = useState(new Set());
     const [prefixes, setPrefixes] = useState(new Set());
-    const [boardSize, setBoardSize] = useState(5);
-    const [board, setBoard] = useState(Array(5).fill('').map(() => Array(5).fill('')));
-    const [minLetters, setMinLetters] = useState(4);
-    const [hasFoundWords, setHasFoundWords] = useState(false);
-    const [highlightedLetters, setHighlightedLetters] = useState([]);
+    const [filteredWords, setFilteredWords] = useState([]);
+    const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
     const timeoutRef = useRef(null);
     const wordsRef = useRef(null);
+    const popupRef = useRef(null);
 
     // Load dictionary into a Set for fast lookup
     useEffect(() => {
         const loadDictionary = async () => {
             try {
                 // Load words from text file
-                const response = await fetch('/words.txt');
+                const response = await fetch('/filteredWords.txt');
                 const text = await response.text();
                 // Split text into an array of words
                 const dictWords = text.split('\n').map(word => word.trim().toLowerCase());
@@ -47,6 +46,20 @@ function FindWords() {
 
         loadDictionary();
     }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (popupRef.current && !popupRef.current.contains(e.target)) {
+                setPopupVisible(false);
+            }
+        };
+
+        document.addEventListener("click", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        }
+    }, [setPopupVisible]);
 
     const findAllNeighbors = useCallback((row, col) => {
         const neighbors = [];
@@ -126,7 +139,7 @@ function FindWords() {
         filterWords(sortedWords);
         setHasFoundWords(true);
         setFilteredWords(sortedWords.filter(wordObject => wordObject.word.length >= minLetters));
-    }, [dictionary, prefixes, board, findWords, minLetters, filterWords]);
+    }, [dictionary, prefixes, board, findWords, setFoundWords, setHasFoundWords, minLetters, filterWords]);
 
     // Filter words when minLetters changes
     useEffect(() => {
@@ -148,31 +161,14 @@ function FindWords() {
         }
     }, [filteredWords]);
 
-    const handleBoardSizeChange = (e) => {
-        const newSize = parseInt(e.target.value, 10);
-        setBoardSize(newSize);
-        clearBoard(newSize);
-        // setBoard(Array(newSize).fill('').map(() => Array(newSize).fill('')));
-        // setFoundWords([]);
-        // setFilteredWords([]);
-        // setHasFoundWords(false);
-        // setHighlightedLetters([]);
-    };
-
     const handleMinLettersChange = (e) => {
         setMinLetters(parseInt(e.target.value, 10));
     };
 
-    const clearBoard = (newSize) => {
-        setBoard(Array(newSize).fill('').map(() => Array(newSize).fill('')));
-        setFoundWords([]);
+    const clearBoardAdds = () => {
         setFilteredWords([]);
         setHasFoundWords(false);
-        setHighlightedLetters([]);
-    };
-
-    const isBoardEmpty = () => {
-        return board.every(row => row.every(cell => cell === ''));
+        clearBoard();
     };
 
     const isBoardFilled = () => {
@@ -196,30 +192,56 @@ function FindWords() {
         }
     };
 
+    const handleWordClick = async (event, wordObject) => {
+        try {
+            const definition = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${wordObject.word}`);
+            const data = await definition.json();
+            console.log("Definition:", data);
+            if (data.title === "No Definitions Found") {
+                console.log("No definitions found for:", wordObject.word);
+                return;
+            }
+            setPopupContent(`${wordObject.word}: ${data[0].meanings[0].definitions[0].definition}`);
+        } catch (error) {
+            console.error("Error handling word click:", error);
+
+        }
+        const rect = event.target.getBoundingClientRect();
+        const popupWidth = 150;
+        const popupHeight = 125;
+
+        // Calculate the position of the pop-up box
+        let top = rect.top + window.scrollY;
+        let left = rect.left + window.scrollX + rect.width;
+
+        // Adjust the position if the pop-up box goes off-screen
+        if (left + popupWidth > window.innerWidth) {
+            left = rect.left + window.scrollX - popupWidth;
+        }
+        if (top + popupHeight > window.innerHeight) {
+            top = rect.top + window.scrollY - popupHeight;
+        }
+
+        top += 10; // Add some padding to the top position
+        left -= 40; // Add some padding to the left position
+
+        setPopupPosition({ top, left });
+        setPopupVisible(true);
+        highlightLetters(wordObject.path);
+    };
+
     return (
         <div className="find-words-container">
             <div className="board-container">
                 <h2>Find words in your Boggle board</h2>
                 <h3>Please enter your Boggle board:</h3>
-                <div className="controls-container">
-                    <button className="generate-board-btn button-spacing" onClick={() => generateRandomBoard(setFoundWords, setBoard, boardSize, setHighlightedLetters)}>Generate Random Board</button>
-                    {!isBoardEmpty() &&
-                        <button className="clear-board-btn" onClick={() => clearBoard(boardSize)}>Clear Board</button>
-                    }
-                    <div>
-                        <select className="dropdown" value={boardSize} onChange={handleBoardSizeChange}>
-                            <option value="4">4x4</option>
-                            <option value="5">5x5</option>
-                        </select>
-                    </div>
-                    <div>
-                        <select className="dropdown" value={minLetters} onChange={handleMinLettersChange}>
-                            <option value="4">Minimum 4 Letters</option>
-                            <option value="3">Minimum 3 Letters</option>
-                        </select>
-                    </div>
-                </div>
-                <BoggleBoard boardSize={boardSize} board={board} setBoard={setBoard} highlightedLetters={highlightedLetters} />
+                <BoardControllers
+                    minLetters={minLetters}
+                    clearBoard={clearBoardAdds}
+                    handleMinLettersChange={handleMinLettersChange}
+                    setHighlightedLetters={setHighlightedLetters}
+                />
+                <BoggleBoard />
                 <button onClick={startFindingWords} disabled={!isBoardFilled()}>Find Words</button>
                 {filteredWords.length > 0 && (
                     <div className="words-list" ref={wordsRef}>
@@ -230,10 +252,15 @@ function FindWords() {
                                 <div
                                     key={index}
                                     className="word-item"
-                                    onClick={() => highlightLetters(wordObject.path)}
+                                    onClick={(e) => handleWordClick(e, wordObject)}
                                 >{wordObject.word}</div>
                             ))}
                         </div>
+                    </div>
+                )}
+                {popupVisible && (
+                    <div className="popup-box" ref={popupRef} style={{ top: popupPosition.top, left: popupPosition.left }}>
+                        {popupContent}
                     </div>
                 )}
             </div>
@@ -241,4 +268,4 @@ function FindWords() {
     );
 }
 
-export default FindWords;
+export default WordFinder;

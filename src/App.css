@@ -133,6 +133,10 @@ select:focus {
     cursor: pointer;
 }
 
+.word-item:hover {
+    background-color: #4a90e2;
+}
+
 .generate-board-btn {
     background-color: #61dafb;
     color: #282c34;
@@ -222,23 +226,56 @@ select:focus {
     font-weight: bold;
 }
 
-.board-input {
+.board-input,
+.board-box {
     text-align: center;
     margin: 5px;
+    padding: 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
-.input-5x5 {
-    width: 50px;
-    height: 50px;
+.board-box {
+    background-color: #a67cc0;
+    color: #fff;
+}
+
+.board-box:hover {
+    background-color: #8e63a7;
+}
+
+.board-input.input-5x5,
+.board-box.input-5x5 {
+    width: 60px;
+    height: 60px;
     font-size: 25px;
 }
 
-.input-4x4 {
-    width: 60px;
-    height: 60px;
+.board-input.input-4x4,
+.board-box.input-4x4 {
+    width: 67px;
+    height: 67px;
     font-size: 30px;
 }
 
 .highlighted {
-    background-color:cyan;
+    background-color: cyan;
+}
+
+.popup-box {
+    position: absolute;
+    background-color: white;
+    color: #000;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-width: 300px;
+    /* Set a maximum width for the pop-up box */
+    word-wrap: break-word;
+    /* Ensure long words break to a new line */
+    white-space: normal;
+    /* Allow text to wrap to a new line */
 }

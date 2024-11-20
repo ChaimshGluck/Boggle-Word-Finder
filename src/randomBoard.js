@@ -1,5 +1,7 @@
-const generateRandomBoard = (setFoundWords, setBoard, boardSize, setHighlightedLetters) => {
-    setFoundWords([]);
+const generateRandomBoard = (setBoard, boardSize, setFoundWords = () => { }, setHighlightedLetters = () => { }, setPopupContent = () => { }, setPopupVisible = () => { }) => {
+    // setFoundWords([]);
+    // setPopupContent('');
+    // setPopupVisible(false);
     const vowels = 'AAAAAEEEEEEEIIIIIOOOOUU'.split('');
     const consonants = 'BBCCDDDFFGGHHJKLLMMNPPQRRSSSTTVWXZ'.split('');
 
@@ -17,7 +19,7 @@ const generateRandomBoard = (setFoundWords, setBoard, boardSize, setHighlightedL
 
         if (every5thNum.includes(i)) {
             row++;
-            column = 1;
+            column = 1; 
         }
     }
 

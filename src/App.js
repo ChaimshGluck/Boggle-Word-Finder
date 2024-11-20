@@ -1,11 +1,14 @@
 import { BrowserRouter as Router } from 'react-router-dom';
 import HomePage from './HomePage';
+import { BoggleProvider } from './BoggleContext';
 
 function App() {
   return (
-    <Router>
-      <HomePage />
-    </Router>
+    <BoggleProvider>
+      <Router>
+        <HomePage />
+      </Router>
+    </BoggleProvider>
   );
 }
 
