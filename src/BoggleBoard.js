@@ -68,7 +68,11 @@ function BoggleBoard() {
         return boardRows;
     };
 
-    return <div className={`boggle-board ${boardSize === 5 ? 'board-5x5' : 'board-4x4'}`}>{renderBoard()}</div>;
+    return (
+        <div className="board-container">
+            <div className={`boggle-board ${boardSize === 5 ? 'board-5x5' : 'board-4x4'}`}>{renderBoard()}</div>
+        </div>
+    )
 }
 
 export default BoggleBoard;

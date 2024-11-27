@@ -11,18 +11,13 @@ body {
     /* Allow the page to scroll */
 }
 
-.container {
-    text-align: center;
-    padding-top: 20px;
-    /* Add padding to the top */
-}
-
 h1 {
     font-size: 2.5em;
     color: #61dafb;
     margin-bottom: 20px;
     margin-top: 20px;
     /* Add margin to the top */
+    text-align: center;
 }
 
 button {
@@ -83,23 +78,15 @@ select:focus {
     outline: none;
 }
 
-.find-words-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
 .board-container {
     text-align: center;
-    width: 100%;
     position: sticky;
     top: 0;
-    background-color: #282c34;
+    background-color: rgb(48, 237, 174);
     z-index: 1;
-    padding-bottom: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
 }
 
 .controls-container {
@@ -112,9 +99,63 @@ select:focus {
     /* Add margin to the bottom */
 }
 
+.board-row {
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: center;
+}
+
+.board-input,
+.board-box {
+    background-color: #fff;
+    color: #282c34;
+    text-align: center;
+    margin: 5px;
+    padding: 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.board-input.input-5x5, .board-box.input-5x5 {
+    width: 60px;
+    height: 60px;
+    font-size: 30px;
+}
+
+.board-input.input-4x4, .board-box.input-4x4 {
+    width: 70px;
+    height: 70px;
+    font-size: 34px;
+}
+
+.word-finder-container,
+.boggle-game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 30px;
+}
+
+.board-input:hover,
+.board-box:hover {
+    background-color: #f0f0f0;
+}
+
+.board-input:focus,
+.board-box:focus {
+    background-color: #e0e0e0;
+}
+
 .words-list {
     width: 100%;
     margin-top: 20px;
+    text-align: center;
 }
 
 .words-grid {
@@ -200,67 +241,22 @@ select:focus {
     transition: background-color 0.3s ease;
 }
 
-.boggle-board {
-    position: sticky;
-    top: 0;
-    background-color: #7dd883;
-    z-index: 1;
-    max-width: 330px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.board-5x5 {
-    width: 25%;
-    min-width: 333px;
-}
+/* .board-5x5 {
+    width: 350px;
+    height: 350px;
+    /* width: auto; */
+/* min-width: 333px; */
+/* }
 
 .board-4x4 {
-    width: 15%;
-    min-width: 315px;
-}
-
-.board-row {
-    display: flex;
-    justify-content: center;
-    font-weight: bold;
-}
-
-.board-input,
-.board-box {
-    text-align: center;
-    margin: 5px;
-    padding: 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.board-box {
-    background-color: #a67cc0;
-    color: #fff;
-}
-
-.board-box:hover {
-    background-color: #8e63a7;
-}
-
-.board-input.input-5x5,
-.board-box.input-5x5 {
-    width: 60px;
-    height: 60px;
-    font-size: 25px;
-}
-
-.board-input.input-4x4,
-.board-box.input-4x4 {
-    width: 67px;
-    height: 67px;
-    font-size: 30px;
-}
+    width: 400px;
+    height: 400px; */
+/* width: auto; */
+/* min-width: 315px; */
+/* } */
 
 .highlighted {
-    background-color: cyan;
+    background-color: yellow;
 }
 
 .popup-box {

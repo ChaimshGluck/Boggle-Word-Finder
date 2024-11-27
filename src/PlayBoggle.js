@@ -4,7 +4,7 @@ import BoggleBoard from "./BoggleGame";
 function PlayBoggle() {
 
     return (
-        <div>
+        <div className="boggle-game-container">
             <h2>Play Boggle</h2>
             <h3>Find words on the board</h3>
             <p>Click on the letters to form a word</p>

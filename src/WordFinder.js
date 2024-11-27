@@ -51,6 +51,8 @@ function WordFinder() {
         const handleClickOutside = (e) => {
             if (popupRef.current && !popupRef.current.contains(e.target)) {
                 setPopupVisible(false);
+                setHighlightedLetters([]);
+                clearTimeout(timeoutRef.current);
             }
         };
 
@@ -59,7 +61,7 @@ function WordFinder() {
         return () => {
             document.removeEventListener("click", handleClickOutside);
         }
-    }, [setPopupVisible]);
+    }, [setPopupVisible, setHighlightedLetters]);
 
     const findAllNeighbors = useCallback((row, col) => {
         const neighbors = [];
@@ -231,39 +233,37 @@ function WordFinder() {
     };
 
     return (
-        <div className="find-words-container">
-            <div className="board-container">
-                <h2>Find words in your Boggle board</h2>
-                <h3>Please enter your Boggle board:</h3>
-                <BoardControllers
-                    minLetters={minLetters}
-                    clearBoard={clearBoardAdds}
-                    handleMinLettersChange={handleMinLettersChange}
-                    setHighlightedLetters={setHighlightedLetters}
-                />
-                <BoggleBoard />
-                <button onClick={startFindingWords} disabled={!isBoardFilled()}>Find Words</button>
-                {filteredWords.length > 0 && (
-                    <div className="words-list" ref={wordsRef}>
-                        <h3>Found Words:</h3>
-                        <p>Total words found: {filteredWords.length}</p>
-                        <div className="words-grid">
-                            {filteredWords.map((wordObject, index) => (
-                                <div
-                                    key={index}
-                                    className="word-item"
-                                    onClick={(e) => handleWordClick(e, wordObject)}
-                                >{wordObject.word}</div>
-                            ))}
-                        </div>
+        <div className="word-finder-container">
+            <h2>Find words in your Boggle board</h2>
+            <h3>Please enter your Boggle board:</h3>
+            <BoardControllers
+                minLetters={minLetters}
+                clearBoard={clearBoardAdds}
+                handleMinLettersChange={handleMinLettersChange}
+                setHighlightedLetters={setHighlightedLetters}
+            />
+            <BoggleBoard />
+            <button onClick={startFindingWords} disabled={!isBoardFilled()}>Find Words</button>
+            {filteredWords.length > 0 && (
+                <div className="words-list" ref={wordsRef}>
+                    <h3>Found Words:</h3>
+                    <p>Total words found: {filteredWords.length}</p>
+                    <div className="words-grid">
+                        {filteredWords.map((wordObject, index) => (
+                            <div
+                                key={index}
+                                className="word-item"
+                                onClick={(e) => handleWordClick(e, wordObject)}
+                            >{wordObject.word}</div>
+                        ))}
                     </div>
-                )}
-                {popupVisible && (
-                    <div className="popup-box" ref={popupRef} style={{ top: popupPosition.top, left: popupPosition.left }}>
-                        {popupContent}
-                    </div>
-                )}
-            </div>
+                </div>
+            )}
+            {popupVisible && (
+                <div className="popup-box" ref={popupRef} style={{ top: popupPosition.top, left: popupPosition.left }}>
+                    {popupContent}
+                </div>
+            )}
         </div>
     );
 }
